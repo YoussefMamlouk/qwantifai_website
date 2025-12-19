@@ -73,9 +73,9 @@ const Navbar = () => {
         isScrolled ? 'bg-dark/90 backdrop-blur-md py-3 shadow-lg shadow-black/20' : 'bg-transparent py-5'
       }`}
     >
-      <div className="container mx-auto px-4 md:px-8 flex justify-between items-center">
+      <div className="container mx-auto pr-4 md:pr-8 pl-0 flex justify-between items-center">
         <Link href="/" className="flex items-center">
-          <div className="relative w-52 h-14">
+          <div className="relative w-40 h-10 md:w-52 md:h-14">
             <Image 
               src="/images/nav_logo.png"
               alt="Qwantifai Logo"
@@ -178,7 +178,7 @@ const Navbar = () => {
             transition={{ duration: 0.3 }}
             className="md:hidden bg-dark/95 backdrop-blur-md border-t border-gray-800"
           >
-            <div className="container mx-auto px-4 py-4 flex flex-col space-y-4">
+            <div className="container mx-auto pr-4 md:pr-8 pl-0 py-4 flex flex-col space-y-4">
               {navItems.map((item) => (
                 <Link 
                   key={item.name}

@@ -36,13 +36,13 @@ const ServiceCard = ({ title, description, icon }: ServiceCardProps) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5 }}
-      className="glass-card p-8 hover-float"
+      className="glass-card p-6 md:p-8 hover-float"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="relative">
         <motion.div 
-          className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center text-primary mb-6"
+          className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary/20 flex items-center justify-center text-primary mb-4 md:mb-6"
           animate={{ 
             scale: isHovered ? 1.1 : 1,
             backgroundColor: isHovered ? 'rgba(0, 183, 255, 0.3)' : 'rgba(0, 183, 255, 0.2)'
@@ -61,7 +61,7 @@ const ServiceCard = ({ title, description, icon }: ServiceCardProps) => {
           animate={{ x: isHovered ? 5 : 0 }}
           transition={{ duration: 0.3 }}
         >
-          <h3 className="text-2xl font-bold mb-4 group-hover:text-primary transition-colors flex items-center">
+          <h3 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 group-hover:text-primary transition-colors flex items-center">
             {title}
             <motion.span
               className="ml-2 text-primary"
@@ -72,7 +72,7 @@ const ServiceCard = ({ title, description, icon }: ServiceCardProps) => {
               →
             </motion.span>
           </h3>
-          <p className="text-gray-400 leading-relaxed">{description}</p>
+          <p className="text-gray-400 leading-relaxed text-sm md:text-base">{description}</p>
         </motion.div>
         
         {/* Decorative elements */}

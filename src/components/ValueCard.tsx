@@ -33,18 +33,18 @@ const ValueCard = ({ title, description, icon, delay = 0 }: ValueCardProps) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay }}
-      className="glass-card p-8 hover-float"
+      className="glass-card p-6 md:p-8 hover-float"
     >
       <div className="flex flex-col items-center text-center">
-        <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-6 text-primary">
+        <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary/20 flex items-center justify-center mb-4 md:mb-6 text-primary">
           {iconMap[icon] || (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 md:h-8 md:w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           )}
         </div>
-        <h3 className="text-2xl font-bold mb-3 text-glow">{title}</h3>
-        <p className="text-gray-300 leading-relaxed">{description}</p>
+        <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-glow">{title}</h3>
+        <p className="text-gray-300 leading-relaxed text-sm md:text-base">{description}</p>
       </div>
     </motion.div>
   );

@@ -16,6 +16,9 @@ module.exports = {
         sans: ['Inter', 'sans-serif'],
         mono: ['Roboto Mono', 'monospace'],
       },
+      screens: {
+        'xs': '475px',
+      },
     },
   },
   plugins: [],

@@ -13,7 +13,6 @@ const nextConfig = {
   // Dev server requires default .next directory and cannot use output: 'export'
   ...(isBuilding ? {
     output: 'export',
-    distDir: 'out',
   } : {}),
   assetPrefix: process.env.NODE_ENV === 'production' ? '' : '',
   generateBuildId: async () => {

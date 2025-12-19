@@ -97,7 +97,7 @@ const ContactForm = () => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
-      className="glass-card p-8 border-t-4 border-primary"
+      className="glass-card p-6 md:p-8 border-t-4 border-primary"
     >
       <AnimatePresence mode="wait">
         {submitSuccess ? (
@@ -138,11 +138,11 @@ const ContactForm = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             onSubmit={handleSubmit}
-            className="space-y-6"
+            className="space-y-4 md:space-y-6"
           >
-            <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold mb-2 text-glow">Get In Touch</h3>
-              <p className="text-gray-300">We'd love to hear from you. Fill out the form below.</p>
+            <div className="text-center mb-6 md:mb-8">
+              <h3 className="text-xl md:text-2xl font-bold mb-2 text-glow">Get In Touch</h3>
+              <p className="text-gray-300 text-sm md:text-base">We'd love to hear from you. Fill out the form below.</p>
             </div>
             
             {submitError && (
@@ -155,7 +155,7 @@ const ContactForm = () => {
               </motion.div>
             )}
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               {formFields.map(field => (
                 <div key={field.name} className="relative">
                   <label htmlFor={field.name} className="block text-sm font-medium mb-2 flex items-center">

@@ -29,14 +29,19 @@ const FALLBACK_URL = 'https://www.qwantifai.com/';
 function isIOS(): boolean {
   if (typeof window === 'undefined') return false;
   
-  const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+  const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera || '';
+  const platform = navigator.platform || '';
   
   // Check for iOS devices (iPhone, iPad, iPod)
-  // Modern iOS devices report as "MacIntel" but have touch support
   const isIOSDevice = /iPad|iPhone|iPod/.test(userAgent);
+  
+  // Modern iOS devices (iOS 13+) report as "MacIntel" but have touch support
   const isIOSSimulator = /Macintosh/.test(userAgent) && navigator.maxTouchPoints > 1;
   
-  return isIOSDevice || isIOSSimulator;
+  // Additional check for iPad on iOS 13+
+  const isIPad = platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+  
+  return isIOSDevice || isIOSSimulator || isIPad;
 }
 
 /**
@@ -46,11 +51,15 @@ function isIOS(): boolean {
 function isAndroid(): boolean {
   if (typeof window === 'undefined') return false;
   
-  const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+  const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera || '';
   
   // Check for Android devices
   // Exclude Chrome OS which also contains "Android" in user agent
-  return /Android/.test(userAgent) && !/Chrome OS/.test(userAgent);
+  const isAndroidDevice = /Android/.test(userAgent) && !/Chrome OS/.test(userAgent);
+  
+  // Additional check: Android devices typically have "Mobile" in user agent
+  // but some tablets might not
+  return isAndroidDevice;
 }
 
 /**
@@ -93,53 +102,55 @@ export default function InstallPage() {
     setMessage(redirectMessage);
     const url = getTargetURL();
     setTargetURL(url);
+    setShowManualLink(true); // Show link immediately
 
-    // Perform redirect immediately on page load
-    // Small delay ensures the page is fully rendered before redirect
-    // This improves user experience by showing the loading state briefly
-    const redirectTimer = setTimeout(() => {
-      if (url) {
-        // Show manual link as fallback
-        setShowManualLink(true);
-        
-        // Perform the redirect
-        // Using replace() instead of href to avoid adding to browser history
-        window.location.replace(url);
-      }
-    }, 100);
-
-    // Fallback: If redirect hasn't happened after 2 seconds, try again
-    const fallbackTimer = setTimeout(() => {
-      // Check if we're still on the install page (redirect might have failed)
-      if (window.location.pathname.includes('/sporty/install') && url) {
-        window.location.href = url;
-      }
-    }, 2000);
-
-    return () => {
-      clearTimeout(redirectTimer);
-      clearTimeout(fallbackTimer);
-    };
-  }, []);
-
-  useEffect(() => {
-    // Handle visibility change (user might have switched tabs)
-    const handleVisibilityChange = () => {
-      if (!document.hidden && window.location.pathname.includes('/sporty/install')) {
-        const url = getTargetURL();
-        if (url) {
-          setTimeout(() => {
-            window.location.replace(url);
-          }, 100);
+    // Perform redirect IMMEDIATELY - no delay
+    // This is critical for mobile devices
+    if (url && typeof window !== 'undefined') {
+      // Multiple redirect attempts to ensure it works
+      const performRedirect = () => {
+        try {
+          window.location.replace(url);
+        } catch (e) {
+          window.location.href = url;
         }
-      }
-    };
+      };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+      // Immediate redirect - use microtask to ensure it runs asap
+      Promise.resolve().then(() => {
+        performRedirect();
+      });
 
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
+      // Also try immediately (synchronous)
+      performRedirect();
+
+      // Fallback: If still on page after 100ms, try again
+      const fallbackTimer = setTimeout(() => {
+        if (window.location.pathname.includes('/sporty/install')) {
+          performRedirect();
+        }
+      }, 100);
+
+      // Another fallback after 500ms
+      const fallbackTimer2 = setTimeout(() => {
+        if (window.location.pathname.includes('/sporty/install')) {
+          performRedirect();
+        }
+      }, 500);
+
+      // Final fallback after 1 second
+      const finalTimer = setTimeout(() => {
+        if (window.location.pathname.includes('/sporty/install')) {
+          window.location.href = url;
+        }
+      }, 1000);
+
+      return () => {
+        clearTimeout(fallbackTimer);
+        clearTimeout(fallbackTimer2);
+        clearTimeout(finalTimer);
+      };
+    }
   }, []);
 
   return (
@@ -148,10 +159,16 @@ export default function InstallPage() {
         <div className="w-10 h-10 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-5"></div>
         <h1 className="text-2xl font-semibold mb-2.5">Redirecting...</h1>
         <p className="mb-5 opacity-90 leading-relaxed">{message}</p>
-        {showManualLink && targetURL && (
+        {targetURL && (
           <a
             href={targetURL}
-            className="inline-block bg-white text-cyan-600 border-none px-6 py-3 rounded-lg font-semibold cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg no-underline"
+            className="inline-block bg-white text-cyan-600 border-none px-6 py-3 rounded-lg font-semibold cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg no-underline mt-4"
+            onClick={(e) => {
+              e.preventDefault();
+              if (targetURL) {
+                window.location.href = targetURL;
+              }
+            }}
           >
             {isIOS() ? 'Open App Store' : isAndroid() ? 'Open Play Store' : 'Continue to Website'}
           </a>
