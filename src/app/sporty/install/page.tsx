@@ -97,17 +97,25 @@ export default function InstallPage() {
   const [showManualLink, setShowManualLink] = useState(false);
 
   useEffect(() => {
-    // Update message immediately
+    // Perform redirect IMMEDIATELY - before any state updates
+    const url = getTargetURL();
+    if (url && typeof window !== 'undefined') {
+      // Redirect immediately - no delays
+      try {
+        window.location.replace(url);
+      } catch (e) {
+        window.location.href = url;
+      }
+    }
+
+    // Update UI (this may not execute if redirect works)
     const redirectMessage = getRedirectMessage();
     setMessage(redirectMessage);
-    const url = getTargetURL();
     setTargetURL(url);
-    setShowManualLink(true); // Show link immediately
+    setShowManualLink(true);
 
-    // Perform redirect IMMEDIATELY - no delay
-    // This is critical for mobile devices
+    // Aggressive fallbacks
     if (url && typeof window !== 'undefined') {
-      // Multiple redirect attempts to ensure it works
       const performRedirect = () => {
         try {
           window.location.replace(url);
@@ -116,39 +124,32 @@ export default function InstallPage() {
         }
       };
 
-      // Immediate redirect - use microtask to ensure it runs asap
-      Promise.resolve().then(() => {
-        performRedirect();
-      });
-
-      // Also try immediately (synchronous)
-      performRedirect();
-
-      // Fallback: If still on page after 100ms, try again
-      const fallbackTimer = setTimeout(() => {
-        if (window.location.pathname.includes('/sporty/install')) {
-          performRedirect();
-        }
-      }, 100);
-
-      // Another fallback after 500ms
-      const fallbackTimer2 = setTimeout(() => {
-        if (window.location.pathname.includes('/sporty/install')) {
-          performRedirect();
-        }
-      }, 500);
-
-      // Final fallback after 1 second
-      const finalTimer = setTimeout(() => {
-        if (window.location.pathname.includes('/sporty/install')) {
-          window.location.href = url;
-        }
-      }, 1000);
+      // Multiple fallback attempts
+      const timers = [
+        setTimeout(() => {
+          if (window.location.pathname.includes('/sporty/install')) {
+            performRedirect();
+          }
+        }, 50),
+        setTimeout(() => {
+          if (window.location.pathname.includes('/sporty/install')) {
+            performRedirect();
+          }
+        }, 200),
+        setTimeout(() => {
+          if (window.location.pathname.includes('/sporty/install')) {
+            performRedirect();
+          }
+        }, 500),
+        setTimeout(() => {
+          if (window.location.pathname.includes('/sporty/install')) {
+            window.location.href = url;
+          }
+        }, 1000),
+      ];
 
       return () => {
-        clearTimeout(fallbackTimer);
-        clearTimeout(fallbackTimer2);
-        clearTimeout(finalTimer);
+        timers.forEach(timer => clearTimeout(timer));
       };
     }
   }, []);
