@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Script from 'next/script';
 
 /**
  * Device Detection and Redirect Script
@@ -155,27 +156,70 @@ export default function InstallPage() {
   }, []);
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center p-5 bg-gradient-to-br from-cyan-500 to-cyan-700 text-white text-center z-50">
-      <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-10 max-w-md w-full">
-        <div className="w-10 h-10 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-5"></div>
-        <h1 className="text-2xl font-semibold mb-2.5">Redirecting...</h1>
-        <p className="mb-5 opacity-90 leading-relaxed">{message}</p>
-        {targetURL && (
-          <a
-            href={targetURL}
-            className="inline-block bg-white text-cyan-600 border-none px-6 py-3 rounded-lg font-semibold cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg no-underline mt-4"
-            onClick={(e) => {
-              e.preventDefault();
-              if (targetURL) {
-                window.location.href = targetURL;
+    <>
+      <Script
+        id="immediate-redirect"
+        strategy="beforeInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              function isIOS() {
+                var ua = navigator.userAgent || navigator.vendor || window.opera || '';
+                var isIOSDevice = /iPad|iPhone|iPod/.test(ua);
+                var isIOSSimulator = /Macintosh/.test(ua) && navigator.maxTouchPoints > 1;
+                var isIPad = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+                return isIOSDevice || isIOSSimulator || isIPad;
               }
-            }}
-          >
-            {isIOS() ? 'Open App Store' : isAndroid() ? 'Open Play Store' : 'Continue to Website'}
-          </a>
-        )}
+              
+              function isAndroid() {
+                var ua = navigator.userAgent || navigator.vendor || window.opera || '';
+                return /Android/.test(ua) && !/Chrome OS/.test(ua);
+              }
+              
+              function getTargetURL() {
+                if (isIOS()) {
+                  return '${APP_STORE_URL}';
+                } else if (isAndroid()) {
+                  return '${PLAY_STORE_URL}';
+                } else {
+                  return '${FALLBACK_URL}';
+                }
+              }
+              
+              var targetURL = getTargetURL();
+              if (targetURL && window.location.pathname.includes('/sporty/install')) {
+                try {
+                  window.location.replace(targetURL);
+                } catch (e) {
+                  window.location.href = targetURL;
+                }
+              }
+            })();
+          `,
+        }}
+      />
+      <div className="fixed inset-0 flex flex-col items-center justify-center p-5 bg-gradient-to-br from-cyan-500 to-cyan-700 text-white text-center z-50">
+        <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-10 max-w-md w-full">
+          <div className="w-10 h-10 border-4 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-5"></div>
+          <h1 className="text-2xl font-semibold mb-2.5">Redirecting...</h1>
+          <p className="mb-5 opacity-90 leading-relaxed">{message}</p>
+          {targetURL && (
+            <a
+              href={targetURL}
+              className="inline-block bg-white text-cyan-600 border-none px-6 py-3 rounded-lg font-semibold cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg no-underline mt-4"
+              onClick={(e) => {
+                e.preventDefault();
+                if (targetURL) {
+                  window.location.href = targetURL;
+                }
+              }}
+            >
+              {isIOS() ? 'Open App Store' : isAndroid() ? 'Open Play Store' : 'Continue to Website'}
+            </a>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

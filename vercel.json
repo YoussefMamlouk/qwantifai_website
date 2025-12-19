@@ -11,27 +11,12 @@
       "dest": "/_next/static/$1"
     },
     {
-      "src": "/sporty/install",
-      "dest": "/sporty/install/index.html"
-    },
-    {
       "src": "/(.*\\.(js|css|ico|png|jpg|jpeg|gif|svg|webp|woff|woff2|ttf|eot))",
       "dest": "/$1"
     },
     {
       "src": "/(.*)",
       "dest": "/index.html"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/sporty/install",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=3600, must-revalidate"
-        }
-      ]
     }
   ]
 }
