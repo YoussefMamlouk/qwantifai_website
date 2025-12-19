@@ -7,12 +7,14 @@
   "devCommand": "npm run dev",
   "routes": [
     {
-      "src": "/_next/static/(.*)",
-      "dest": "/_next/static/$1"
+      "src": "^/sporty/install$",
+      "status": 308,
+      "headers": {
+        "Location": "/sporty/install/"
+      }
     },
     {
-      "src": "/(.*\\.(js|css|ico|png|jpg|jpeg|gif|svg|webp|woff|woff2|ttf|eot))",
-      "dest": "/$1"
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
